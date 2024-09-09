@@ -45,10 +45,3 @@ class Util {
     Util.fpsEnabled = show;
   }
 }
-
-
-
-  
-
-  
-

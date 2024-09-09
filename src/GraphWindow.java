@@ -5,6 +5,7 @@ import processing.core.PApplet;
 
 class GraphWindow extends PApplet {
     //JFrame frame;
+    GPlot plot;
 
     public GraphWindow() {
         super();
@@ -12,20 +13,20 @@ class GraphWindow extends PApplet {
     }
 
     public void settings() {
-        size(450, 300, P3D);
+        size(450, 300, P2D);
         smooth();
     }
     public void setup() {
         windowTitle("Graph");
-
+        plot = new GPlot(this);
     }
 
     public void draw() {
         background(0);
         // Draw graph
-        GPlot plot = new GPlot(this);
+
         plot.setPos(0,0);
-        //plot.setPoints(Util.graphPointsArray);
+        plot.setPoints(Util.graphPointsArray);
         plot.defaultDraw();
     }
 

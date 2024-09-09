@@ -4,6 +4,9 @@ import com.krab.lazy.LazyGui;
 import grafica.GPointsArray;
 import processing.core.PApplet;
 import processing.core.PGraphics;
+import processing.core.*;
+
+import static java.util.Objects.nonNull;
 
 
 public class Sincos extends PApplet {
@@ -53,7 +56,7 @@ public class Sincos extends PApplet {
         frameRate(desiredFrameRate);
 
         // Memory LEAK
-        //graphWin = new GraphWindow();
+        graphWin = new GraphWindow();
     }
 
 
@@ -98,7 +101,7 @@ public class Sincos extends PApplet {
         mg.beginDraw();
         {
             float slider = gui.slider("Slider",0,-1,0);
-            // Fading code BROKEN
+            // Fading code TODO: FIX BROKEN
 //            if (frameCount % 2 == 0) {
 //                mg.pushStyle();
 //                {
@@ -186,18 +189,18 @@ public class Sincos extends PApplet {
                     //src.Util.graphPointsArray.removeRange(0,src.Util.graphPointsArray.getNPoints());
                     //print(pointsBuffer.buffer);
 
-                    // Memory LEAK:
-//                    {
-//                        int i = 0;
-//                        for (PVector point : pointsBuffer.buffer) {
-//                            if (nonNull(point)) {
-//                                Util.graphPointsArray.get(i).setY(point.y);//add((int) point.x, point);
-//                                i++;
-//                            } else {
-//                                break;
-//                            }
-//                        }
-//                    }
+                    // TODO: Fix Memory LEAK:
+                    {
+                        int i = 0;
+                        for (PVector point : pointsBuffer.buffer) {
+                            if (nonNull(point)) {
+                                Util.graphPointsArray.get(i).setY(point.y);//add((int) point.x, point);
+                                i++;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
                     ot += 0.3f;
                 }
                 mg.pop();
