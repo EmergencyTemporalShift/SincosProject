@@ -10,7 +10,6 @@ import static java.util.Objects.nonNull;
 
 
 public class Sincos extends PApplet {
-    @SuppressWarnings("unused")
     PApplet graphWin;
     final static float ppi = Util.ppi;
     float it;  // Inner t

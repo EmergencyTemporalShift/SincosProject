@@ -24,7 +24,6 @@ class GraphWindow extends PApplet {
     public void draw() {
         background(0);
         // Draw graph
-
         plot.setPos(0,0);
         plot.setPoints(Util.graphPointsArray);
         plot.defaultDraw();
