@@ -2,7 +2,7 @@ package src;
 
 import processing.core.PVector;
 
-// ChatGPT plus modifications by me
+// ChatGPT plus modifications by EmergencyTemporalShift, free to use without attribution.
 public class CircularBuffer {
     PVector[] buffer;
     int maxSize;
@@ -12,7 +12,7 @@ public class CircularBuffer {
         buffer = new PVector[size];
         maxSize = size;
     }
-
+    @SuppressWarnings("unused")
     void add(float value) {
         buffer[currentIndex] = new PVector((float) currentIndex, value);
         currentIndex = (currentIndex + 1) % maxSize;

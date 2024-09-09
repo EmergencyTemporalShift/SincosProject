@@ -4,7 +4,7 @@ import grafica.GPlot;
 import processing.core.PApplet;
 
 class GraphWindow extends PApplet {
-    //JFrame frame;
+
     GPlot plot;
 
     public GraphWindow() {
@@ -19,6 +19,9 @@ class GraphWindow extends PApplet {
     public void setup() {
         windowTitle("Graph");
         plot = new GPlot(this);
+        plot.setBgColor(0x80);
+        plot.setBoxBgColor(0xA0);
+        frameRate(10);
     }
 
     public void draw() {

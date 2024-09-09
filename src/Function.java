@@ -14,8 +14,8 @@ public class Function {
 
   @SuppressWarnings("unused")
   public static float function(float theta, float ot) {
-    return (float) (sin(4*ppi*theta));
-                   //-1*cos((5+ot)*ppi*theta));
-           //+(1f/10)*cos(200*ppi*theta); //Extra high frequency waves
+    return (float) (sin(4f*ppi*(theta))
+                       //+cos(ppi*ot));//-1*cos((5+ot)*ppi*theta));
+               +(1f/10)*cos(200*ppi*(theta+ot))); //Extra high frequency waves
   }
 }

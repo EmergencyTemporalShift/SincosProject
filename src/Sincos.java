@@ -1,21 +1,22 @@
 package src;
 
 import com.krab.lazy.LazyGui;
+import grafica.GPoint;
 import grafica.GPointsArray;
 import processing.core.PApplet;
 import processing.core.PGraphics;
-import processing.core.*;
 
-import static java.util.Objects.nonNull;
+import static src.Util.graphPointsArray;
+import static src.Util.s;
+import static src.Util.mode;
 
 
 public class Sincos extends PApplet {
-    PApplet graphWin;
+    //PApplet graphWin;
     final static float ppi = Util.ppi;
     float it;  // Inner t
     int itStep; // Likely different from frame count
     float ot; // Outer t
-    int s; // Steps;
     float tm; // Both t multiplier
     int lastTime;
     int delta;
@@ -31,11 +32,13 @@ public class Sincos extends PApplet {
 }
 
     public void setup() {
+        smooth();
         gui = new LazyGui(this);
         mg = createGraphics(width, height);
         mg.beginDraw();
         {
             mg.colorMode(HSB, 360, 100, 100, 100);
+            background(0);
             mg.strokeWeight(0.0625f);
         }
         mg.endDraw();
@@ -43,37 +46,35 @@ public class Sincos extends PApplet {
         itStep = 0;
         ot = 0;
         tm = 1;
-        s = 3000;
-        lastTime = 0;
-        delta = 0;
+        Util.changeMode(mode);
+
+        //lastTime = 0;
+        //delta = 0;
         pointsBuffer = new CircularBuffer(3000);
-        Util.graphPointsArray = new GPointsArray(3000);
+        graphPointsArray = new GPointsArray(3000);
         for(int i = 0; i<3000; i++) {
-            Util.graphPointsArray.add(i,0);
+            graphPointsArray.add(i,0);
         }
         desiredFrameRate = 30;
         frameRate(desiredFrameRate);
 
-        // Memory LEAK
-        graphWin = new GraphWindow();
+        // Create graph window
+        //graphWin = new GraphWindow();
     }
 
 
     public void keyPressed() {
+        // I know that I could short circuit these, but I like it better this way.
         if (key == CODED) {
             if (keyCode == UP) {
                 s += 1;
             }
             if (keyCode == DOWN) {
                 s -= 1;
-
                 s = max(1, s);
-                if (s == 0)
-                    frameRate(1);
-                else {
-                    frameRate(desiredFrameRate);
-                }
             }
+            //print(s);
+
             if (keyCode == LEFT) {
                 tm *= 1 / 1.1f;
             }
@@ -82,53 +83,63 @@ public class Sincos extends PApplet {
             }
             //println(tm);
         }
-        //print(s);
-        if (key == 'f') {
-            Util.enableFPS();
+
+        switch (key) {
+            case 'f':
+                Util.enableFPS();
+                break;
+            case 'p':
+                Util.togglePause();
+                break;
+            case 'm':
+                mg.background(0);
+                Util.changeMode();
+                break;
+            //print(key);
         }
-        if (key == 'p') {
-            Util.togglePause();
-        }
-        //print(key);
     }
 
     public void draw() {
-        //delta = millis() - lastTime;
+        delta = millis() - lastTime;
+        float otInc = gui.slider("otInc", 0.007f, 0f, .01f);
+        @SuppressWarnings("unused")
+        float a = gui.slider("a", 0, -.05f, .05f);
+
         it = 0;
 
         // Draw main shape
         mg.beginDraw();
         {
-            float slider = gui.slider("Slider",0,-1,0);
-            // Fading code TODO: FIX BROKEN
-//            if (frameCount % 2 == 0) {
-//                mg.pushStyle();
-//                {
-//                    mg.blendMode(SUBTRACT);
-//                    mg.noStroke();
-//                    mg.fill(0, 0, 0, 1);
-//                    mg.rect(0, 0, width, height);
-//                }
-//                mg.popStyle();
-//            }
-
             if (!Util.paused) {
                 mg.push();
                 {
-                    mg.background(0);
+                    if (mode.equals("FAST")) {
+                        mg.background(0);
+                        mg.fill(0,0,0,100);
+                        mg.rect(0, 0, width, height);
+                    } else {
+                        it = 0;
+                        // Fading code TODO: FIX BROKEN
+//                        if (frameCount % 2 == 0) {
+//                            mg.pushStyle();
+//                            {
+//                                mg.blendMode(SUBTRACT);
+//                                mg.noStroke();
+//                                mg.fill(0, 0, 0, 1);
+//                                mg.rect(0, 0, width, height);
+//                            }
+//                            mg.popStyle();
+//                        }
+                    }
                     mg.translate(width / 2f, height / 2f);
-                    //background(0);
-                    //it = 0;
+                    // The beef of this program, creates part of or the whole spiral depending on Util.mode
                     for (int i = 0; i < s; i++) {
-
-                        //background(0);
-
                         float theta = it;
-                        float r = Function.function(theta, slider);
+                        float r = Function.function(theta, ot);
                         //if()
-                        pointsBuffer.add(r);
+                        //pointsBuffer.add(r);
 
-                        //graphPointsArray.set(itStep % s, new GPoint(itStep % s, r));
+                        graphPointsArray.set(itStep % s, new GPoint(itStep % s, r));
 
                         float x = 10 * r * cos(TAU * theta);
                         float y = 10 * r * sin(TAU * theta);
@@ -162,50 +173,33 @@ public class Sincos extends PApplet {
                         mg.line(40 * cos(ic * it * ppi),
                                 40 * sin(ic * it * ppi),
                                 x, y);
-                        //Transform Attempt
-                        //mg.pushMatrix();
-                        //  //translate(sin(ppi*it),0);
-                        //  mg.rotate(ic*it*ppi);
-                        //  mg.line(40,0,60,0);
-                        //  //PVector circleCoords = getTransformedPoint(40,0);
-                        //  //println(screenX(40,0));
-                        //mg.popMatrix();
-                        // Flipped line
-                        //mg.push();
-                        //    mg.rotate(PI/3);
-                        //    mg.scale(-1,1);
-                        //    mg.line(40*-cos(ic*it*ppi),
-                        //         40* sin(ic*it*ppi),
-                        //        x, y);
-                        //          mg.stroke(0,0,100);
-                        //    mg.strokeWeight(1);
-                        //    mg.point(x,y);
-                        //mg.pop();
+//                        //Transform Attempt
+//                        mg.pushMatrix();
+//                          //translate(sin(ppi*it),0);
+//                          mg.rotate(ic*it*ppi);
+//                          mg.line(40,0,60,0);
+//                          //PVector circleCoords = getTransformedPoint(40,0);
+//                          //println(screenX(40,0));
+//                        mg.popMatrix();
+//                         //Flipped line
+//                        mg.push();
+//                            mg.rotate(PI/3);
+//                            mg.scale(-1,1);
+//                            mg.line(40*-cos(ic*it*ppi),
+//                                 40* sin(ic*it*ppi),
+//                                x, y);
+//                                  mg.stroke(0,0,100);
+//                            mg.strokeWeight(1);
+//                            mg.point(x,y);
+//                        mg.pop();
 
                         it += 0.001f * tm;
-                        itStep +=1;
+                        itStep += 1;
                     }
-                    //src.Util.graphPointsArray.removeRange(0,src.Util.graphPointsArray.getNPoints());
-                    //print(pointsBuffer.buffer);
-
-                    // TODO: Fix Memory LEAK:
-                    {
-                        int i = 0;
-                        for (PVector point : pointsBuffer.buffer) {
-                            if (nonNull(point)) {
-                                Util.graphPointsArray.get(i).setY(point.y);//add((int) point.x, point);
-                                i++;
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    ot += 0.3f;
+                    ot += otInc;
                 }
                 mg.pop();
             }
-
-
             Util.displayDebug(this, mg, tm, s);
         }
         mg.endDraw();
@@ -213,8 +207,10 @@ public class Sincos extends PApplet {
         image(mg, 0, 0);
 
 
-        //lastTime = millis();
+        lastTime = millis();
     }
+
+
 
     public static void main(String... args){
         PApplet.main("src.Sincos");
