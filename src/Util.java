@@ -13,50 +13,71 @@ class Util {
   static Boolean fpsEnabled = true;
   static boolean paused = false;
 
+  //public static CopyOnWriteArrayList<GPoint> graphPointsCOW;
   public static GPointsArray graphPointsArray;
-  public static String mode = "FAST";
+  static int tsize = 24;
+  static PGraphics debugBar;
 
-  static void displayDebug(PApplet p, PGraphics mg, float tm, float s) {
+  public static String mode = "SLOW";
+  public static Boolean doModeSwitch = true;
+  public static Boolean doDebugClear = true;
+
+  static void initDebug(PApplet ma) {
+    debugBar = ma.createGraphics(ma.width, tsize*3, JAVA2D);
+    debugBar.beginDraw();
+    debugBar.textSize(tsize);
+    debugBar.endDraw();
+  }
+
+  static void displayDebug(PApplet ma, float tm, float s) {
     if (Util.fpsEnabled) {
-      mg.push();
+      debugBar.beginDraw();
+      debugBar.push();
       {
-        mg.textSize(24);
-        mg.colorMode(HSB, 100);
-        mg.fill(0);
-        mg.rect(0, 0, mg.width, 24);
-        mg.rect(0, mg.textSize, mg.width, 24);
+        debugBar.textSize(24);
+        debugBar.colorMode(HSB, 100);
+        debugBar.fill(0);
+        debugBar.rect(0, 0, debugBar.width, 24);
+        debugBar.rect(0, debugBar.textSize, debugBar.width, 24);
 
-        mg.fill(100);
+        debugBar.fill(100);
 
-        mg.textAlign(LEFT, TOP);
-        mg.text("FPS: " + nf(p.frameRate, 1, 2), 0, 0);
-        mg.text("Mode: " + mode, 0, mg.textSize);
+        debugBar.textAlign(LEFT, TOP);
+        debugBar.text("FPS: " + nf(ma.frameRate, 1, 2), 0, 0);
+        debugBar.text("Mode: " + mode, 0, debugBar.textSize);
 
-        mg.textAlign(CENTER, TOP);
-        mg.text("TimeStep Multiplier: " + nf(tm, 1, 2), mg.width / 2f, 0);
+        debugBar.textAlign(CENTER, TOP);
+        debugBar.text("TimeStep Multiplier: " + nf(tm, 1, 2), debugBar.width / 2f, 0);
 
-        mg.textAlign(RIGHT, TOP);
-        mg.text("Steps per frame: " + nf(s, 1, 0), mg.width, 0);
+        debugBar.textAlign(RIGHT, TOP);
+        debugBar.text("Steps per frame: " + nf(s, 1, 0), debugBar.width, 0);
     }
-    mg.pop();
+      debugBar.pop();
+      debugBar.endDraw();
+      ma.image(debugBar,0,0);
     }
-
+      else { // TODO: Blank bar only once
+        if(doDebugClear) {
+          debugBar.rect(0, 0, debugBar.width, 24*3);
+        }
+      }
+      doDebugClear = false;
   }
 
   static void togglePause() {
     Util.paused = !Util.paused;
   }
 
-  static void enableFPS() {
+  static void toggleFPS() {
     Util.fpsEnabled = !Util.fpsEnabled;
   }
 
   @SuppressWarnings("unused")
-  static void enableFPS(Boolean show) {
+  static void toggleFPS(Boolean show) {
     Util.fpsEnabled = show;
   }
 
-  static void changeMode(String lMode) { // Local mode
+  static void toggleMode(String lMode) { // Local mode
     if(lMode.equals("SLOW")) {
       mode = "SLOW";
       s = 1;
@@ -64,10 +85,10 @@ class Util {
       mode = "FAST";
       s = 3000;
     }
+    doModeSwitch = true;
   }
 
-  static void changeMode() {
-
+  static void toggleMode() {
     if (mode.equals("SLOW")) {
       mode = "FAST";
       s = 3000;
@@ -78,5 +99,6 @@ class Util {
         graphPointsArray.set(i,new GPoint(i,0));
       }
     }
+    doModeSwitch = true;
   }
 }
