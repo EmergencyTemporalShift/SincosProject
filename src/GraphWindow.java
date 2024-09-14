@@ -3,6 +3,7 @@ package src;
 import grafica.GPlot;
 import processing.core.PApplet;
 
+@SuppressWarnings("unused")
 class GraphWindow extends PApplet {
 
     GPlot plot;

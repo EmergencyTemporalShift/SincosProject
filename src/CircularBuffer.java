@@ -3,9 +3,10 @@ package src;
 import processing.core.PVector;
 
 // ChatGPT plus modifications by EmergencyTemporalShift, free to use without attribution.
+@SuppressWarnings("unused")
 public class CircularBuffer {
-    PVector[] buffer;
-    int maxSize;
+    final PVector[] buffer;
+    final int maxSize;
     int currentIndex = 0;
 
     CircularBuffer(int size) {

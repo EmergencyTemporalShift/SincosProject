@@ -18,6 +18,7 @@ import static src.Util.*;
  * Main class for creating a dynamic sine-cosine graph pattern.
  * It uses circular buffers and a LazyGui interface for user input controls.
  */
+@SuppressWarnings("SameParameterValue")
 public class Sincos extends PApplet {
     final static float ppi = Util.ppi;  // Constant multiplier for calculations
     float it;  // Inner time variable (theta)
@@ -36,6 +37,7 @@ public class Sincos extends PApplet {
     /**
      * Sets up the window size and renderer.
      */
+    @Override
     public void settings() {
         size(800, 800, P2D); // Use 800x800 window with P2D renderer
     }
@@ -43,6 +45,7 @@ public class Sincos extends PApplet {
     /**
      * Initializes the sketch with graphics, buffers, GUI, and initial conditions.
      */
+    @Override
     public void setup() {
         smooth(); // Enables anti-aliasing
         gui = new LazyGui(this); // Initialize LazyGui for user controls
@@ -58,9 +61,9 @@ public class Sincos extends PApplet {
         initDebug(this);
 
         // Initialize variables
-        it = 0;
+        it = 0;     // Inner time
         itStep = 0;
-        ot = 0;
+        ot = 0;     // Outer time
         tm = 1; // Default time multiplier
 
         // Change the drawing mode (e.g., FAST, SLOW) using a utility method
@@ -93,6 +96,7 @@ public class Sincos extends PApplet {
     /**
      * Handles key presses, updates key states, and controls mode toggles.
      */
+    @Override
     public void keyPressed() {
         // Handle coded keys (e.g., arrow keys)
         if (key == CODED) {
@@ -112,7 +116,7 @@ public class Sincos extends PApplet {
 
         // Handle other key presses for toggling specific actions or modes
         switch (key) {
-            case 'f': // Enable FPS display
+            case 'f': // Enable debug display While held instead?
                 Util.toggleDebug();
                 break;
             case 'p': // Toggle pause
@@ -128,6 +132,7 @@ public class Sincos extends PApplet {
     /**
      * Handles key releases, resets key states.
      */
+    @Override
     public void keyReleased() {
         // Reset key states when coded keys (e.g., arrow keys) are released
         if (key == CODED) {
@@ -149,19 +154,19 @@ public class Sincos extends PApplet {
     /**
      * Main draw loop that renders the sine-cosine pattern. Updates at each frame.
      */
+    @Override
     public void draw() {
         delta = millis() - lastTime; // Calculate time since last frame
         float otInc = gui.slider("otInc", 0f, 0f, 0.03f); // Slider for outer time increment
         float a = gui.slider("a", 0, 0f, 8f); // Slider for controlling parameter 'a'
         background(0,0,0,100); // Clear the screen with a transparent background
 
-        // TODO: Double check color settings
         // Start drawing to the off-screen graphics buffer
         mg.beginDraw();
         {
             if (!Util.paused) {
                 if(mode.equals("SLOW"))
-                    fadeGraphics(mg,1); // Apply fading effect in slow mode
+                    fadeGraphics(mg,-5); // Apply fading effect in slow mode
                 mg.push();
                 {
                     // Fast drawing mode
@@ -237,6 +242,7 @@ public class Sincos extends PApplet {
         lastTime = millis();
     }
 
+// Move to util
     /**
      * Applies a fade effect to the graphics by reducing the alpha value of all pixels.
      *
@@ -247,13 +253,13 @@ public class Sincos extends PApplet {
         if (fadeAmount > 0 || fadeAmount < 0 && frameCount % -fadeAmount == 0) {
             //g.beginDraw();
             g.loadPixels();
-
+//
             // Iterate over all pixels
             for (int i = 0; i < g.pixels.length; i++) {
                 // Get the current alpha value
                 int alpha = (g.pixels[i] >> 24) & 0xFF;
                 // Reduce the alpha value
-                alpha = max(0, alpha - fadeAmount);
+                alpha = max(0, alpha - ((fadeAmount > 0) ? fadeAmount : 1));
 
                 // Update the pixel with the new alpha value
                 g.pixels[i] = alpha << 24 | (g.pixels[i]) & 0xFFFFFF;
@@ -266,7 +272,9 @@ public class Sincos extends PApplet {
     /**
      * Background update thread that handles time-based changes and key input.
      */
+    @SuppressWarnings("unused")
     public class UpdateLoop extends Thread {
+        @Override
         public void run() {
             while (true) {
                 // Update time and state variables
@@ -292,6 +300,7 @@ public class Sincos extends PApplet {
                     //noinspection BusyWait
                     Thread.sleep( max(1000 / desiredFrameRate - delta, 0));
                 } catch (InterruptedException e) {
+                    //noinspection CallToPrintStackTrace
                     e.printStackTrace();
                 }
             }
