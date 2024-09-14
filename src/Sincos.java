@@ -12,6 +12,7 @@ import static src.Util.*;
 
 // forum.processing.org/two/discussion/13189/a-better-way-to-fade
 // Fader code by benja and not subject to license.
+// Some edits by chatGPT and IntelliJ AI Assistant
 
 /**
  * Main class for creating a dynamic sine-cosine graph pattern.
@@ -49,7 +50,7 @@ public class Sincos extends PApplet {
         mg.beginDraw();
         {
             mg.colorMode(HSB, 360, 100, 100, 100); // Use HSB color mode for hue control
-            background(0); // Set background to black
+            mg.background(0); // Set background to black
             mg.strokeWeight(0.0625f); // Set very thin stroke weight
         }
         mg.endDraw();
@@ -96,13 +97,13 @@ public class Sincos extends PApplet {
         // Handle coded keys (e.g., arrow keys)
         if (key == CODED) {
             if (keyCode == UP) {
-                keysPressed.put("UP", 1);
+                keysPressed.put("UP",    1);
             }
             if (keyCode == DOWN) {
-                keysPressed.put("DOWN", 1);
+                keysPressed.put("DOWN",  1);
             }
             if (keyCode == LEFT) {
-                keysPressed.put("LEFT", 1);
+                keysPressed.put("LEFT",  1);
             }
             if (keyCode == RIGHT) {
                 keysPressed.put("RIGHT", 1);
@@ -131,13 +132,13 @@ public class Sincos extends PApplet {
         // Reset key states when coded keys (e.g., arrow keys) are released
         if (key == CODED) {
             if (keyCode == UP) {
-                keysPressed.put("UP", 0);
+                keysPressed.put("UP",    0);
             }
             if (keyCode == DOWN) {
-                keysPressed.put("DOWN", 0);
+                keysPressed.put("DOWN",  0);
             }
             if (keyCode == LEFT) {
-                keysPressed.put("LEFT", 0);
+                keysPressed.put("LEFT",  0);
             }
             if (keyCode == RIGHT) {
                 keysPressed.put("RIGHT", 0);
@@ -153,13 +154,14 @@ public class Sincos extends PApplet {
         float otInc = gui.slider("otInc", 0f, 0f, 0.03f); // Slider for outer time increment
         float a = gui.slider("a", 0, 0f, 8f); // Slider for controlling parameter 'a'
         background(0,0,0,100); // Clear the screen with a transparent background
-        if(mode.equals("SLOW"))
-            fadeGraphics(mg,-1); // Apply fading effect in slow mode
-            // TODO: Double check color settings
+
+        // TODO: Double check color settings
         // Start drawing to the off-screen graphics buffer
         mg.beginDraw();
         {
             if (!Util.paused) {
+                if(mode.equals("SLOW"))
+                    fadeGraphics(mg,1); // Apply fading effect in slow mode
                 mg.push();
                 {
                     // Fast drawing mode
@@ -243,15 +245,14 @@ public class Sincos extends PApplet {
      */
     void fadeGraphics(PGraphics g, int fadeAmount) {
         if (fadeAmount > 0 || fadeAmount < 0 && frameCount % -fadeAmount == 0) {
-            g.beginDraw();
+            //g.beginDraw();
             g.loadPixels();
 
             // Iterate over all pixels
             for (int i = 0; i < g.pixels.length; i++) {
-
                 // Get the current alpha value
                 int alpha = (g.pixels[i] >> 24) & 0xFF;
-
+                //
                 // Reduce the alpha value
                 alpha = max(0, alpha - fadeAmount);
 
@@ -259,7 +260,7 @@ public class Sincos extends PApplet {
                 g.pixels[i] = alpha << 24 | (g.pixels[i]) & 0xFFFFFF;
             }
             g.updatePixels();
-            g.endDraw();
+            //g.endDraw();
         }
     }
 
@@ -268,38 +269,34 @@ public class Sincos extends PApplet {
      */
     public class UpdateLoop extends Thread {
         public void run() {
-            int lastTime = 0; // Initialize local lastTime for this thread
-            do {
-                delta = millis() - lastTime; // Calculate delta time in the thread loop
-
-                // Handle key inputs to adjust parameters
-                if (keysPressed.get("UP") >= 1) {
-                    s += 1; // Increase number of steps (points)
-                    keysPressed.put("UP", keysPressed.get("UP") + 1);
+            while (true) {
+                // Update time and state variables
+                delta = millis() - lastTime;
+                lastTime = millis();
+                if (keysPressed.get("UP") == 1) {
+                    s += 1;
                 }
-                if (keysPressed.get("DOWN") >= 1) {
-                    s = max(1, s - 1); // Decrease number of steps, minimum of 1
-                    keysPressed.put("DOWN", keysPressed.get("DOWN") + 1);
+                if (keysPressed.get("DOWN") == 1) {
+                    s -= 1;
+                    s = Math.max(1, s); // Ensure s does not go below 1
                 }
-                if (keysPressed.get("LEFT") >= 1) {
-                    tm *= 1 / 1.1f; // Decrease time multiplier
-                    keysPressed.put("LEFT", keysPressed.get("LEFT") + 1);
+                if (keysPressed.get("LEFT") == 1) {
+                    tm *= 1 / 1.1f;
                 }
-                if (keysPressed.get("RIGHT") >= 1) {
-                    tm *= 1.1f; // Increase time multiplier
-                    keysPressed.put("RIGHT", keysPressed.get("RIGHT") + 1);
+                if (keysPressed.get("RIGHT") == 1) {
+                    tm *= 1.1f;
                 }
 
-                // Sleep to maintain 60 FPS-like behavior
+
+                // Sleep the thread to save CPU cycles
                 try {
+                    // Maybe wait till the next timestep with a modulo to skip an update but keep timing?
                     //noinspection BusyWait
-                    sleep(max((1000 / 60) - delta, 0));
+                    Thread.sleep( max(1000 / desiredFrameRate - delta, 0));
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
-
-                lastTime = millis(); // Update last time for the thread loop
-            } while (true); // Loop indefinitely
+            }
         }
     }
 
