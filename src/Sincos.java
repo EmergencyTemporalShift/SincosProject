@@ -12,7 +12,7 @@ import static src.Util.*;
 
 // forum.processing.org/two/discussion/13189/a-better-way-to-fade
 // Fader code by benja and not subject to license.
-// Some edits by chatGPT and IntelliJ AI Assistant
+// Some minor edits by chatGPT and IntelliJ AI Assistant
 
 /**
  * Main class for creating a dynamic sine-cosine graph pattern.
@@ -29,7 +29,7 @@ public class Sincos extends PApplet {
     int desiredFrameRate; // Desired frame rate for the sketch
     HashMap<String, Integer> keysPressed; // Stores pressed key states
 
-    CircularBuffer pointsBuffer; // Buffer to store points for drawing
+    //CircularBuffer pointsBuffer; // Buffer to store points for drawing
     LazyGui gui; // GUI for user interaction and sliders
     PGraphics mg; // Off-screen graphics object for main pattern rendering
 
@@ -49,7 +49,7 @@ public class Sincos extends PApplet {
         mg = createGraphics(width, height, JAVA2D); // Create an off-screen PGraphics for drawing
         mg.beginDraw();
         {
-            mg.colorMode(HSB, 360, 100, 100, 100); // Use HSB color mode for hue control
+            mg.colorMode(HSB, 360, 100, 100,100); // Use HSB color mode for hue control
             mg.background(0); // Set background to black
             mg.strokeWeight(0.0625f); // Set very thin stroke weight
         }
@@ -64,9 +64,9 @@ public class Sincos extends PApplet {
         tm = 1; // Default time multiplier
 
         // Change the drawing mode (e.g., FAST, SLOW) using a utility method
-        Util.toggleMode(mode);
+        Util.setMode(mode);
 
-        pointsBuffer = new CircularBuffer(3000); // Initialize the circular buffer with a size of 3000
+        //pointsBuffer = new CircularBuffer(3000); // Initialize the circular buffer with a size of 3000
         graphPointsArray = new GPointsArray(3000); // Array to hold points for the graph
 
         // Pre-fill the GPointsArray with default values
@@ -113,7 +113,7 @@ public class Sincos extends PApplet {
         // Handle other key presses for toggling specific actions or modes
         switch (key) {
             case 'f': // Enable FPS display
-                Util.toggleFPS();
+                Util.toggleDebug();
                 break;
             case 'p': // Toggle pause
                 Util.togglePause();
@@ -252,7 +252,6 @@ public class Sincos extends PApplet {
             for (int i = 0; i < g.pixels.length; i++) {
                 // Get the current alpha value
                 int alpha = (g.pixels[i] >> 24) & 0xFF;
-                //
                 // Reduce the alpha value
                 alpha = max(0, alpha - fadeAmount);
 
@@ -286,7 +285,6 @@ public class Sincos extends PApplet {
                 if (keysPressed.get("RIGHT") == 1) {
                     tm *= 1.1f;
                 }
-
 
                 // Sleep the thread to save CPU cycles
                 try {
