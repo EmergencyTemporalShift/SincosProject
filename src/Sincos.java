@@ -246,6 +246,11 @@ public class Sincos extends PApplet {
         lastTime = millis();
     }
 
+    @Override
+    public void exit() {
+        isExiting = true;
+        super.exit();
+    }
 
     /**
      * Background update thread that handles time-based changes and key input.
@@ -254,7 +259,7 @@ public class Sincos extends PApplet {
     public class UpdateLoop extends Thread {
         @Override
         public void run() {
-            while (true) {
+            while (!isExiting) {
                 // Update time and state variables
                 delta = millis() - lastTime;
                 lastTime = millis();
@@ -283,11 +288,14 @@ public class Sincos extends PApplet {
                 }
             }
         }
+
+
     }
 
     /**
      * Main method to start the Processing sketch.
      */
+    @SuppressWarnings("unused")
     public static void main(String... args) {
         PApplet.main("src.Sincos");
     }

@@ -11,10 +11,15 @@ import java.time.format.DateTimeFormatter;
 
 import static processing.core.PApplet.*;
 
-@SuppressWarnings("preview")
+// Don't know why Intellij can't me using this but whatever.
+@SuppressWarnings({"preview", "unused"})
 public class Util {
   final static float PPI = PI / 5f; // Part pi
+
+  public static boolean isExiting;
+
   public static int s;
+
   static Boolean debugEnabled = true;
   static boolean paused = false;
 
