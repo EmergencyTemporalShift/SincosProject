@@ -18,9 +18,10 @@ import static src.Util.*;
  * Main class for creating a dynamic sine-cosine graph pattern.
  * It uses circular buffers and a LazyGui interface for user input controls.
  */
-@SuppressWarnings("SameParameterValue")
+
+@SuppressWarnings("preview")
 public class Sincos extends PApplet {
-    final static float ppi = Util.ppi;  // Constant multiplier for calculations
+    final static float ppi = Util.PPI;  // Constant multiplier for calculations
     float it;  // Inner time variable (theta)
     int itStep; // Step counter, usually synced with frame count but manually controlled
     float ot; // Outer time variable
@@ -126,7 +127,10 @@ public class Sincos extends PApplet {
                 mg.background(0);
                 Util.toggleMode();
                 break;
-        }
+            case 's': // Clear background and change drawing mode
+                //noinspection preview
+                saveScreenshot(this, mg, STR."Sincos_\{getIsoTimestamp()}.png");
+                break;}
     }
 
     /**
@@ -164,9 +168,9 @@ public class Sincos extends PApplet {
         // Start drawing to the off-screen graphics buffer
         mg.beginDraw();
         {
-            if (!Util.paused) {
+            if (!paused) {
                 if(mode.equals("SLOW"))
-                    fadeGraphics(mg,-5); // Apply fading effect in slow mode
+                    fadeGraphics(this, mg, -5); // Apply fading effect in slow mode
                 mg.push();
                 {
                     // Fast drawing mode
@@ -177,11 +181,11 @@ public class Sincos extends PApplet {
                         it = 0; // Reset the inner time in fast mode
                     } else {
                         // Switch to slow drawing mode, clear background once
-                        if (doModeSwitch) {
+                        if (doModeSwitchAction) {
                             mg.background(0);
                         }
                     }
-                    doModeSwitch = false;
+                    doModeSwitchAction = false;
 
                     // Translate drawing to the center of the window
                     mg.translate(width / 2f, height / 2f);
@@ -232,7 +236,7 @@ public class Sincos extends PApplet {
         }
         mg.endDraw();
 
-        // Display the off-screen graphics on the main canvas
+        // Display the Sincos graphics on the main canvas
         image(mg, 0, 0);
 
         // Display debug information if enabled
@@ -242,32 +246,6 @@ public class Sincos extends PApplet {
         lastTime = millis();
     }
 
-// Move to util
-    /**
-     * Applies a fade effect to the graphics by reducing the alpha value of all pixels.
-     *
-     * @param g           the PGraphics to apply the fade effect on
-     * @param fadeAmount  the amount to reduce the alpha per frame
-     */
-    void fadeGraphics(PGraphics g, int fadeAmount) {
-        if (fadeAmount > 0 || fadeAmount < 0 && frameCount % -fadeAmount == 0) {
-            //g.beginDraw();
-            g.loadPixels();
-//
-            // Iterate over all pixels
-            for (int i = 0; i < g.pixels.length; i++) {
-                // Get the current alpha value
-                int alpha = (g.pixels[i] >> 24) & 0xFF;
-                // Reduce the alpha value
-                alpha = max(0, alpha - ((fadeAmount > 0) ? fadeAmount : 1));
-
-                // Update the pixel with the new alpha value
-                g.pixels[i] = alpha << 24 | (g.pixels[i]) & 0xFFFFFF;
-            }
-            g.updatePixels();
-            //g.endDraw();
-        }
-    }
 
     /**
      * Background update thread that handles time-based changes and key input.
@@ -285,7 +263,7 @@ public class Sincos extends PApplet {
                 }
                 if (keysPressed.get("DOWN") == 1) {
                     s -= 1;
-                    s = Math.max(1, s); // Ensure s does not go below 1
+                    s = Math.max(1, s); // steps per frame must not go below 1, press 'p' to pause.
                 }
                 if (keysPressed.get("LEFT") == 1) {
                     tm *= 1 / 1.1f;

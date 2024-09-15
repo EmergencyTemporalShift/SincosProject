@@ -12,8 +12,10 @@ class GraphWindow extends PApplet {
         super();
         PApplet.runSketch(new String[]{this.getClass().getName()}, this);
     }
-
-    public void settings() {
+/**
+ * Initialize window size and renderer settings.
+ */
+ public void settings() {
         size(450, 300, P2D);
         smooth();
     }
@@ -35,7 +37,7 @@ class GraphWindow extends PApplet {
 
     public void mousePressed() {
 
-    }
+    } //beginning
 
     public void mouseDragged() {
 
