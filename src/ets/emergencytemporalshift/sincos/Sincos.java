@@ -1,4 +1,4 @@
-package src;
+package src.ets.emergencytemporalshift.sincos;
 
 import com.krab.lazy.LazyGui;
 import grafica.GPoint;
@@ -8,7 +8,7 @@ import processing.core.PGraphics;
 
 import java.util.HashMap;
 
-import static src.Util.*;
+import static src.ets.emergencytemporalshift.sincos.Util.*;
 
 // forum.processing.org/two/discussion/13189/a-better-way-to-fade
 // Fader code by benja and not subject to license.
@@ -297,6 +297,6 @@ public class Sincos extends PApplet {
      */
     @SuppressWarnings("unused")
     public static void main(String... args) {
-        PApplet.main("src.Sincos");
+        PApplet.main("src.ets.emergencytemporalshift.sincos.Sincos");
     }
 }

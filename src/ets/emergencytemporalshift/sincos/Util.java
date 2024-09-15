@@ -1,4 +1,4 @@
-package src;
+package src.ets.emergencytemporalshift.sincos;
 
 import grafica.GPoint;
 import grafica.GPointsArray;
